@@ -1,0 +1,15 @@
+[prune]
+  go-tests = true
+  unused-packages = true
+
+[[constraint]]
+  name = "github.com/docker/docker"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/docker/go-connections"
+  version = "0.4.0"
+
+[[override]]
+  branch = "master"
+  name = "github.com/docker/distribution"
