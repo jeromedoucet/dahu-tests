@@ -118,6 +118,23 @@ func StopContainer(id string, dockerApiVersion string) {
 	failFast(err)
 }
 
+type ContainerDetail struct {
+	Ip string
+}
+
+func FindContainerDetails(id string, dockerApiVersion string) ContainerDetail {
+	ctx := context.Background()
+
+	cli, err := client.NewClientWithOpts(client.WithVersion(dockerApiVersion))
+	failFast(err)
+
+	var inspectResult types.ContainerJSON
+	inspectResult, err = cli.ContainerInspect(ctx, id)
+	failFast(err)
+
+	return ContainerDetail{Ip: inspectResult.NetworkSettings.IPAddress}
+}
+
 func waitForService(tcpPort string) {
 	try := 0
 	for {
