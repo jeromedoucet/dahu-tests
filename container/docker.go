@@ -111,7 +111,7 @@ func StopContainer(id string, dockerApiVersion string) {
 
 	failFast(err)
 
-	removeOpt := types.ContainerRemoveOptions{Force: true}
+	removeOpt := types.ContainerRemoveOptions{Force: true, RemoveVolumes: true}
 
 	err = cli.ContainerRemove(ctx, id, removeOpt)
 
