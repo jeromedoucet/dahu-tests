@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -57,9 +58,26 @@ func StartGogs(dockerApiVersion string) string {
 
 	failFast(err)
 
-	waitForService("10080")
+	waitForGogs("10080")
 
 	return createdContainer.ID
+}
+
+func waitForGogs(port string) {
+	try := 0
+	for {
+		if try > 20 {
+			panic(errors.New("gogs http port unreachable"))
+		}
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%s/healthcheck", port))
+		try++
+		if err != nil || resp.StatusCode != http.StatusOK {
+			fmt.Println(fmt.Printf("Failed to reach gogs at %d attempt", try))
+			<-time.After(1 * time.Second)
+		} else {
+			break
+		}
+	}
 }
 
 func StartDockerRegistry(dockerApiVersion string) string {
