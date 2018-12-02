@@ -122,6 +122,34 @@ func StartDockerRegistry(dockerApiVersion string) string {
 	return createdContainer.ID
 }
 
+func PushImage(dockerApiVersion, from, to, registryAuth string) {
+
+	var r io.ReadCloser
+
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.WithVersion(dockerApiVersion))
+
+	failFast(err)
+
+	pullImage(from, cli, ctx)
+
+	err = cli.ImageTag(ctx, from, to)
+
+	failFast(err)
+
+	r, err = cli.ImagePush(ctx, to, types.ImagePushOptions{RegistryAuth: registryAuth})
+
+	failFast(err)
+
+	_, err = io.Copy(os.Stdout, r)
+
+	failFast(err)
+
+	_, err = cli.ImageRemove(ctx, to, types.ImageRemoveOptions{Force: true})
+
+	failFast(err)
+}
+
 func StopContainer(id string, dockerApiVersion string) {
 	ctx := context.Background()
 
